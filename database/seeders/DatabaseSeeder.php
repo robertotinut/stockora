@@ -38,6 +38,11 @@ class DatabaseSeeder extends Seeder
         );
         $admin->companies()->syncWithoutDetaching([$defaultCompany->id => ['role' => 'owner', 'is_default' => 1, 'is_active' => 1]]);
 
+        $defaultWarehouse = \App\Models\Warehouse::firstOrCreate(
+            ['company_id' => $defaultCompany->id, 'is_default' => 1],
+            ['name' => 'Main Warehouse', 'code' => 'WH-MAIN', 'is_active' => 1]
+        );
+
         // 2. Units
         $pcs = Unit::firstOrCreate(['name' => 'Pieces'], ['symbol' => 'pcs']);
         $box = Unit::firstOrCreate(['name' => 'Box'], ['symbol' => 'box']);
@@ -244,6 +249,7 @@ class DatabaseSeeder extends Seeder
 
         // 7. Realistic Stock Movements
         StockMovement::create([
+            'warehouse_id' => $defaultWarehouse->id,
             'product_id' => $createdProducts['PRD-A4-75']->id,
             'type' => 'in',
             'quantity' => 100,
@@ -256,6 +262,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         StockMovement::create([
+            'warehouse_id' => $defaultWarehouse->id,
             'product_id' => $createdProducts['PRD-MOU-WRL']->id,
             'type' => 'in',
             'quantity' => 20,
@@ -268,6 +275,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         StockMovement::create([
+            'warehouse_id' => $defaultWarehouse->id,
             'product_id' => $createdProducts['PRD-A4-75']->id,
             'type' => 'out',
             'quantity' => 15,
@@ -280,6 +288,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         StockMovement::create([
+            'warehouse_id' => $defaultWarehouse->id,
             'product_id' => $createdProducts['PRD-PLP-GEL']->id,
             'type' => 'out',
             'quantity' => 3,
@@ -292,6 +301,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         StockMovement::create([
+            'warehouse_id' => $defaultWarehouse->id,
             'product_id' => $createdProducts['PRD-TNR-85A']->id,
             'type' => 'adjustment',
             'quantity' => -1,
