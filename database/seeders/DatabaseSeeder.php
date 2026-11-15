@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
             ['code' => 'DEFAULT'],
             ['name' => 'Default Company', 'is_active' => 1, 'account_status' => 'ACTIVE', 'access_type' => 'INTERNAL']
         );
-        app(\App\Services\TenantContext::class)->set($defaultCompany->id);
+        app(\App\Services\TenantContext::class)->setCompany($defaultCompany->id);
 
         // 1. Admin User
         $admin = User::firstOrCreate(
