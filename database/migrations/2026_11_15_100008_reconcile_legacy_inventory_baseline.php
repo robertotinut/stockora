@@ -32,9 +32,17 @@ return new class extends Migration
 
         $cuRow = $conn->selectOne('SELECT user_id FROM `company_user` WHERE `company_id` = ? ORDER BY `is_default` DESC, `user_id` ASC LIMIT 1', [$companyId]);
         if (!$cuRow) {
-            throw new RuntimeException("MISSING_COMPANY_USER for company={$companyId}");
+            $existingUser = $conn->selectOne('SELECT id FROM `users` ORDER BY id ASC LIMIT 1');
+            if ($existingUser) {
+                $reconUserId = (int) $existingUser->id;
+            } else {
+                $conn->statement("INSERT INTO `users` (`name`, `email`, `password`, `created_at`, `updated_at`) VALUES ('System Migration', 'system@stockora.local', '!', NOW(), NOW())");
+                $reconUserId = (int) $conn->getPdo()->lastInsertId();
+            }
+            $conn->statement("INSERT IGNORE INTO `company_user` (`company_id`, `user_id`, `role`, `is_default`, `is_active`) VALUES (?, ?, 'owner', 1, 1)", [$companyId, $reconUserId]);
+        } else {
+            $reconUserId = (int) $cuRow->user_id;
         }
-        $reconUserId = (int) $cuRow->user_id;
 
         $conn->transaction(function () use ($conn, $companyId, $whId, $reconUserId): void {
             $products = $conn->select('SELECT id, code, name, stock, purchase_price FROM `products` WHERE `company_id` = ? ORDER BY id ASC FOR UPDATE', [$companyId]);
