@@ -20,6 +20,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(SubscriptionPlanSeeder::class);
+
+        $defaultCompany = \App\Models\Company::firstOrCreate(
+            ['code' => 'DEFAULT'],
+            ['name' => 'Default Company', 'is_active' => 1, 'account_status' => 'ACTIVE', 'access_type' => 'INTERNAL']
+        );
+        app(\App\Services\TenantContext::class)->set($defaultCompany->id);
+
         // 1. Admin User
         $admin = User::firstOrCreate(
             ['email' => 'admin@stockora.com'],
@@ -28,6 +36,7 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('password'),
             ]
         );
+        $admin->companies()->syncWithoutDetaching([$defaultCompany->id => ['role' => 'owner', 'is_default' => 1, 'is_active' => 1]]);
 
         // 2. Units
         $pcs = Unit::firstOrCreate(['name' => 'Pieces'], ['symbol' => 'pcs']);
@@ -293,7 +302,5 @@ class DatabaseSeeder extends Seeder
             'user_id' => $admin->id,
             'notes' => 'Hasil stock opname bulanan: 1 cartridge cacat fisik',
         ]);
-
-        $this->call(SubscriptionPlanSeeder::class);
     }
 }
