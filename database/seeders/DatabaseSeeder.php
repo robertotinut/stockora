@@ -248,10 +248,11 @@ class DatabaseSeeder extends Seeder
         );
 
         // 7. Realistic Stock Movements
-        StockMovement::create([
+        StockMovement::firstOrCreate(['idempotency_key' => 'SEED-SM-001'], [
             'warehouse_id' => $defaultWarehouse->id,
             'product_id' => $createdProducts['PRD-A4-75']->id,
             'type' => 'in',
+            'direction' => 'IN',
             'quantity' => 100,
             'reference_type' => 'Purchase',
             'reference_id' => $po1->id,
@@ -261,10 +262,11 @@ class DatabaseSeeder extends Seeder
             'notes' => 'Penerimaan PO-202611-001 dari CV Mitra Abadi',
         ]);
 
-        StockMovement::create([
+        StockMovement::firstOrCreate(['idempotency_key' => 'SEED-SM-002'], [
             'warehouse_id' => $defaultWarehouse->id,
             'product_id' => $createdProducts['PRD-MOU-WRL']->id,
             'type' => 'in',
+            'direction' => 'IN',
             'quantity' => 20,
             'reference_type' => 'Purchase',
             'reference_id' => $po2->id,
@@ -274,10 +276,11 @@ class DatabaseSeeder extends Seeder
             'notes' => 'Penerimaan PO-202611-002 dari PT Digital Tech',
         ]);
 
-        StockMovement::create([
+        StockMovement::firstOrCreate(['idempotency_key' => 'SEED-SM-003'], [
             'warehouse_id' => $defaultWarehouse->id,
             'product_id' => $createdProducts['PRD-A4-75']->id,
             'type' => 'out',
+            'direction' => 'OUT',
             'quantity' => 15,
             'reference_type' => 'Usage',
             'reference_id' => null,
@@ -287,10 +290,11 @@ class DatabaseSeeder extends Seeder
             'notes' => 'Pengeluaran kebutuhan operasional kantor cabang',
         ]);
 
-        StockMovement::create([
+        StockMovement::firstOrCreate(['idempotency_key' => 'SEED-SM-004'], [
             'warehouse_id' => $defaultWarehouse->id,
             'product_id' => $createdProducts['PRD-PLP-GEL']->id,
             'type' => 'out',
+            'direction' => 'OUT',
             'quantity' => 3,
             'reference_type' => 'Sale',
             'reference_id' => null,
@@ -300,11 +304,12 @@ class DatabaseSeeder extends Seeder
             'notes' => 'Distribusi unit ATK departemen finance',
         ]);
 
-        StockMovement::create([
+        StockMovement::firstOrCreate(['idempotency_key' => 'SEED-SM-005'], [
             'warehouse_id' => $defaultWarehouse->id,
             'product_id' => $createdProducts['PRD-TNR-85A']->id,
             'type' => 'adjustment',
-            'quantity' => -1,
+            'direction' => 'OUT',
+            'quantity' => 1,
             'reference_type' => 'Opname',
             'reference_id' => null,
             'stock_before' => 4,
