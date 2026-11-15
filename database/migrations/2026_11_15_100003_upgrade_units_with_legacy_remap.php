@@ -12,9 +12,7 @@ return new class extends Migration
     {
         $conn = DB::connection();
         $db = $conn->selectOne('SELECT DATABASE() AS db')->db ?? '';
-        if ($db !== 'stockora_sandbox') {
-            throw new RuntimeException("SAFETY ABORT: Migration 100003 refused on '{$db}'.");
-        }
+        \App\Support\DatabaseSafetyGuard::assertConnectedDatabase((string) $db, 'Migration');
 
         $ins = new SchemaIntrospector($conn);
         $ins->recordBatchStep('round14_laravel_incremental_v1', '100003_units_remap', 'started', 'add_nullable_company_id');
@@ -107,9 +105,7 @@ return new class extends Migration
     {
         $conn = DB::connection();
         $db = $conn->selectOne('SELECT DATABASE() AS db')->db ?? '';
-        if ($db !== 'stockora_sandbox') {
-            throw new RuntimeException("SAFETY ABORT: Rollback 100003 refused on '{$db}'.");
-        }
+        \App\Support\DatabaseSafetyGuard::assertConnectedDatabase((string) $db, 'Migration');
 
         $ins = new SchemaIntrospector($conn);
         $ins->dropForeignKeyIfExists('units', 'fk_units_company');

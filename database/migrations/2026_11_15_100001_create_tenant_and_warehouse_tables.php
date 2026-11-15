@@ -11,9 +11,7 @@ return new class extends Migration
     private function guardSandbox($conn): void
     {
         $db = $conn->selectOne('SELECT DATABASE() AS db')->db ?? '';
-        if ($db !== 'stockora_sandbox') {
-            throw new RuntimeException("SAFETY ABORT: Migration 100001 refused on non-sandbox DB '{$db}'.");
-        }
+        \App\Support\DatabaseSafetyGuard::assertConnectedDatabase((string) $db, 'Migration');
     }
 
     public function up(): void

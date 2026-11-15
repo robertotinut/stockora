@@ -13,9 +13,7 @@ return new class extends Migration
     {
         $conn = DB::connection();
         $db = $conn->selectOne('SELECT DATABASE() AS db')->db ?? '';
-        if ($db !== 'stockora_sandbox') {
-            throw new RuntimeException("SAFETY ABORT: Migration 100008 refused on '{$db}'.");
-        }
+        \App\Support\DatabaseSafetyGuard::assertConnectedDatabase((string) $db, 'Migration');
 
         $ins = new SchemaIntrospector($conn);
         $ins->recordBatchStep('round14_laravel_incremental_v1', '100008_legacy_reconcile', 'started', 'begin');
@@ -209,9 +207,7 @@ return new class extends Migration
     {
         $conn = DB::connection();
         $db = $conn->selectOne('SELECT DATABASE() AS db')->db ?? '';
-        if ($db !== 'stockora_sandbox') {
-            throw new RuntimeException("SAFETY ABORT: Rollback 100008 refused on '{$db}'.");
-        }
+        \App\Support\DatabaseSafetyGuard::assertConnectedDatabase((string) $db, 'Migration');
 
         // Reverting reconciliation NEVER deletes any existing legacy stock_movements or products rows
         $conn->transaction(function () use ($conn): void {

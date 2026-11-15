@@ -12,9 +12,7 @@ return new class extends Migration
     {
         $conn = DB::connection();
         $db = $conn->selectOne('SELECT DATABASE() AS db')->db ?? '';
-        if ($db !== 'stockora_sandbox') {
-            throw new RuntimeException("SAFETY ABORT: Migration 100004 refused on '{$db}'.");
-        }
+        \App\Support\DatabaseSafetyGuard::assertConnectedDatabase((string) $db, 'Migration');
 
         $ins = new SchemaIntrospector($conn);
         $ins->recordBatchStep('round14_laravel_incremental_v1', '100004_products_upgrade', 'started', 'add_columns');
@@ -78,9 +76,7 @@ return new class extends Migration
     {
         $conn = DB::connection();
         $db = $conn->selectOne('SELECT DATABASE() AS db')->db ?? '';
-        if ($db !== 'stockora_sandbox') {
-            throw new RuntimeException("SAFETY ABORT: Rollback 100004 refused on '{$db}'.");
-        }
+        \App\Support\DatabaseSafetyGuard::assertConnectedDatabase((string) $db, 'Migration');
 
         $ins = new SchemaIntrospector($conn);
         $ins->dropForeignKeyIfExists('products', 'fk_products_unit_comp');

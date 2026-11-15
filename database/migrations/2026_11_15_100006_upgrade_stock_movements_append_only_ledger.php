@@ -12,9 +12,7 @@ return new class extends Migration
     {
         $conn = DB::connection();
         $db = $conn->selectOne('SELECT DATABASE() AS db')->db ?? '';
-        if ($db !== 'stockora_sandbox') {
-            throw new RuntimeException("SAFETY ABORT: Migration 100006 refused on '{$db}'.");
-        }
+        \App\Support\DatabaseSafetyGuard::assertConnectedDatabase((string) $db, 'Migration');
 
         $ins = new SchemaIntrospector($conn);
         $ins->recordBatchStep('round14_laravel_incremental_v1', '100006_stock_movements_ledger', 'started', 'begin');
@@ -116,9 +114,7 @@ return new class extends Migration
     {
         $conn = DB::connection();
         $db = $conn->selectOne('SELECT DATABASE() AS db')->db ?? '';
-        if ($db !== 'stockora_sandbox') {
-            throw new RuntimeException("SAFETY ABORT: Rollback 100006 refused on '{$db}'.");
-        }
+        \App\Support\DatabaseSafetyGuard::assertConnectedDatabase((string) $db, 'Migration');
 
         $ins = new SchemaIntrospector($conn);
         $chk = $conn->selectOne("SELECT COUNT(*) AS c FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = ? AND TABLE_NAME = 'stock_movements' AND CONSTRAINT_NAME = 'chk_sm_quantity_positive'", [$db]);
